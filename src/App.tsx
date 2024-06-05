@@ -1,8 +1,11 @@
 import { useRef, useState } from "react"
 
 /**
- * use standard HTML and click event to draw the grid, colours etc ... 
- * once finished export the data to a 16x16 canvas and export as PNG
+ * TODO:
+ *  Add modes support DRAW | DELETE
+ *  Fix export
+ *  Fix export preview (90% rotated for some reason)
+ *  Add semi decent toolbars for colors / modes etc ... 
  */
 
 function App() {
