@@ -63,16 +63,10 @@ function App() {
       }
     }
 
-
-    // Convert the canvas to data
     var image = exportCanvas.current.toDataURL();
-    // Create a link
     var aDownloadLink = document.createElement('a');
-    // Add the name of the file to the link
     aDownloadLink.download = 'my_yoto_image.png';
-    // Attach the data to the link
     aDownloadLink.href = image;
-    // Get the code to click the download link
     aDownloadLink.click();
 
   }
