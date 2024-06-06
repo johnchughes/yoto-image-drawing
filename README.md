@@ -6,6 +6,10 @@
 
 # ToDo
  [ ] Refactor it all. 
+
  [ ] Add a UI framework so it looks semi decent.
+
  [ ] implement drawing modes.
+
  [ ] validate imported files.
+ 
