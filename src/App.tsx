@@ -1,3 +1,4 @@
+import { Button, Container, Flex, Input, Stack } from "@mantine/core";
 import { useEffect, useRef, useState } from "react"
 
 /**
@@ -21,7 +22,7 @@ function App() {
 
   const [name, setName] = useState<string>("my_yoto_image");
   const [colours, setColours] = useState<string[]>([]);
-  
+
   const [pixels, setPixels] = useState<string[][]>(new Array(GRID_SIZE).fill(DEFAULT_COLOUR).map(() => new Array(GRID_SIZE).fill(DEFAULT_COLOUR)));
 
   const colourPicker = useRef<HTMLInputElement>(null);
@@ -138,12 +139,10 @@ function App() {
 
     };
 
-    if(e.target.files)
-    {
-        reader.readAsText(e.target.files[0])
+    if (e.target.files) {
+      reader.readAsText(e.target.files[0])
     }
-    else
-    {
+    else {
       alert('no files selected');
     }
   }
@@ -154,71 +153,75 @@ function App() {
   }
 
   return (
-    <div style={{ display: "flex", flexDirection: "row", margin: 8 }}>
-      <input ref={fileInput} type="file" onChange={importFile} style={{display:'none'}}></input>
-      <div  style={{ display: 'fex', flexDirection: 'column' }}>
-
+    <Container>
+      <div style={{ display: "flex", flexDirection: "row", margin: 8 }}>
+        <input ref={fileInput} type="file" onChange={importFile} style={{ display: 'none' }}></input>
         <div style={{ display: 'fex', flexDirection: 'column' }}>
-          <canvas ref={exportCanvas} width={16} height={16}></canvas>
-          <button style={{ display: 'block' }} onClick={() => exportPNG()} disabled={name.length === 0}>export image</button>
-          <button style={{ display: 'block' }} onClick={() => exportJSON()} disabled={name.length === 0}>export config</button>
-          <button style={{ display: 'block' }} onClick={() => fileInput.current?.click()}>Import config</button>
-        </div>
 
+          <Stack>
+            <canvas ref={exportCanvas} width={16} height={16} style={{maxHeight:16, maxWidth:16}}></canvas>
+            <Button onClick={() => exportPNG()} disabled={name.length === 0}>export image</Button>
+            <Button onClick={() => exportJSON()} disabled={name.length === 0}>export config</Button>
+            <Button onClick={() => fileInput.current?.click()}>Import config</Button>
+          </Stack>
 
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
 
-        </div>
-
-      </div>
-
-
-
-      <div style={{ display: 'flex', flexDirection: 'column', marginLeft: 8 }}>
-        {name.length == 0 && <div style={{background:'red', color:'white', padding: '8px', marginBottom:8}}>Enter a name to export</div>}
-        <input type="text" value={name} onChange={(e) => setName(e.target.value)} placeholder="image name ... "></input>
-
-        <div style={{ display: 'flex', flexDirection: 'row', marginBottom: 8, gap: 4, alignItems: 'center' }}>
-          <input ref={colourPicker} type="color" />
-
-          <button onClick={fill} style={{ height: 32 }}>fill</button>
-
-
-          <div style={{ display: 'flex', flexDirection: 'row', gap: 2 }}>
-            {colours.map(colour => <div key={colour} onClick={() => { onColourClicked(colour) }} style={{ width: 32, height: 32, background: colour, border: "1px solid black", }}></div>)}
           </div>
 
         </div>
 
-        {pixels.map((px, pxi) => {
 
-          return (
-            <div style={{ display: "flex", flexDirection: "row" }} key={`row_${pxi}`}>
-              {px.map((py, pyi) => {
 
-                const chequered = {
-                  'backgroundImage': "linear-gradient(45deg, #bbbdbf 25%, transparent 25%),linear-gradient(45deg, transparent 75%, #bbbdbf 75%),linear-gradient(45deg, transparent 75%, #bbbdbf 75%),linear-gradient(45deg, #bbbdbf 25%, #fff 25%)",
-                  'backgroundSize': `${PIXEL_SIZE}px ${PIXEL_SIZE}px`,
-                  'backgroundPosition': `0 0, 0 0, -${PIXEL_SIZE / 2}px -${PIXEL_SIZE / 2}px, ${PIXEL_SIZE / 2}px ${PIXEL_SIZE / 2}px`
-                };
+        <div style={{ display: 'flex', flexDirection: 'column', marginLeft: 8 }}>
+          {name.length == 0 && <div style={{ background: 'red', color: 'white', padding: '8px', marginBottom: 8 }}>Enter a name to export</div>}
+          {/* <input type="text" value={name} onChange={(e) => setName(e.target.value)} placeholder="image name ... "></input> */}
+          <Input variant="filled" size="md" radius="xs" value={name} onChange={(e) => setName(e.target.value)} placeholder="image name ... " />
+          {/* <div style={{ display: 'flex', flexDirection: 'row', marginBottom: 8, gap: 4, alignItems: 'center' }}> */}
+            <Flex 
+              direction={"row"} 
+              gap={"md"}
+              justify={"flex-start"}
+              align={"flex-start"}
+              >
+            <input ref={colourPicker} type="color" />
 
-                const backgroundColour = {
-                  'backgroundColor': py
-                }
+            <Button onClick={fill}>fill</Button>
 
-                const pixel_background = py ? backgroundColour : chequered;
 
-                return <div key={`pixel_${pxi}_${pyi}`} onClick={() => onPixelClicked(pxi, pyi)} style={{ width: PIXEL_SIZE, height: PIXEL_SIZE, marginRight: PIXEL_SIZE / 4, marginBottom: PIXEL_SIZE / 4, border: "1px solid black", ...pixel_background }}></div>
-              })}
+            <div style={{ display: 'flex', flexDirection: 'row', gap: 2 }}>
+              {colours.map(colour => <div key={colour} onClick={() => { onColourClicked(colour) }} style={{ width: 32, height: 32, background: colour, border: "1px solid black", }}></div>)}
             </div>
-          )
-        })}
+            </Flex>
+          {/* </div> */}
 
+          {pixels.map((px, pxi) => {
+
+            return (
+              <div style={{ display: "flex", flexDirection: "row" }} key={`row_${pxi}`}>
+                {px.map((py, pyi) => {
+
+                  const chequered = {
+                    'backgroundImage': "linear-gradient(45deg, #bbbdbf 25%, transparent 25%),linear-gradient(45deg, transparent 75%, #bbbdbf 75%),linear-gradient(45deg, transparent 75%, #bbbdbf 75%),linear-gradient(45deg, #bbbdbf 25%, #fff 25%)",
+                    'backgroundSize': `${PIXEL_SIZE}px ${PIXEL_SIZE}px`,
+                    'backgroundPosition': `0 0, 0 0, -${PIXEL_SIZE / 2}px -${PIXEL_SIZE / 2}px, ${PIXEL_SIZE / 2}px ${PIXEL_SIZE / 2}px`
+                  };
+
+                  const backgroundColour = {
+                    'backgroundColor': py
+                  }
+
+                  const pixel_background = py ? backgroundColour : chequered;
+
+                  return <div key={`pixel_${pxi}_${pyi}`} onClick={() => onPixelClicked(pxi, pyi)} style={{ width: PIXEL_SIZE, height: PIXEL_SIZE, marginRight: PIXEL_SIZE / 4, marginBottom: PIXEL_SIZE / 4, border: "1px solid black", ...pixel_background }}></div>
+                })}
+              </div>
+            )
+          })}
+
+        </div>
       </div>
-
-
-
-    </div>
+    </Container>
   )
 }
 
