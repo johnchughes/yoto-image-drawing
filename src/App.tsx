@@ -61,11 +61,11 @@ function App() {
 
     for (let x = 0; x < pixels.length; x++) {
       for (let y = 0; y < pixels[x].length; y++) {
+        console.log(x, y);
         const pixel = pixels[x][y];
-        console.log(pixel);
         if (pixel) {
           ctx.rect(x, y, 1, 1);
-          ctx.fillStyle = pixels[x][y];
+          ctx.fillStyle = pixel;
           ctx.fillRect(x, y, 1, 1);
         }
         else {
@@ -76,6 +76,7 @@ function App() {
       }
     }
 
+    //todo: reactify this
     var image = exportCanvas.current.toDataURL();
     var aDownloadLink = document.createElement('a');
     aDownloadLink.download = 'my_yoto_image.png';
@@ -83,6 +84,33 @@ function App() {
     aDownloadLink.click();
 
   }
+
+  interface ImageConfig {
+    image_name: string,
+    pixels: string[][],
+    grid_size: number
+  }
+
+  const exportJSON = () => {
+    const cfg : ImageConfig = {
+      image_name: "my_yoto_pic",
+      pixels: pixels,
+      grid_size: GRID_SIZE
+    };
+
+    const jsonString = JSON.stringify(cfg);
+
+    //todo: reactify this
+    var element = document.createElement('a');
+    element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(jsonString));
+    element.setAttribute('download', `${cfg.image_name}.json`);
+    element.style.display = 'none';
+    document.body.appendChild(element);
+    element.click();
+    document.body.removeChild(element);
+  }
+
+
 
   const fill = () => {
     const colourHex: string = colourPicker.current?.value as string;
@@ -96,7 +124,8 @@ function App() {
 
         <div style={{ display: 'fex', flexDirection: 'column' }}>
           <canvas ref={exportCanvas} width={16} height={16}></canvas>
-          <button style={{ display: 'block' }} onClick={() => exportPNG()}>export</button>
+          <button style={{ display: 'block' }} onClick={() => exportPNG()}>export image</button>
+          <button style={{display: 'block'}} onClick={() => exportJSON()}>export config</button>
         </div>
 
 
