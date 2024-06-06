@@ -19,7 +19,7 @@ function App() {
 
   const [mode, setMode] = useState<DRAW_MODE>("DRAW");
 
-  const [name, setName] = useState<string>("");
+  const [name, setName] = useState<string>("yoto_pic");
   const [colours, setColours] = useState<string[]>([]);
   
   const [pixels, setPixels] = useState<string[][]>(new Array(GRID_SIZE).fill(DEFAULT_COLOUR).map(() => new Array(GRID_SIZE).fill(DEFAULT_COLOUR)));
@@ -103,7 +103,7 @@ function App() {
 
   const exportJSON = () => {
     const cfg: ImageConfig = {
-      image_name: "my_yoto_pic",
+      image_name: name ?? "yoto_pic",
       pixels: pixels,
       grid_size: GRID_SIZE,
       palette: colours
@@ -121,9 +121,6 @@ function App() {
     document.body.removeChild(element);
   }
 
-  const importJSON = () => {
-
-  }
 
   //TODO: add event type
   const importFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -135,6 +132,7 @@ function App() {
         var _config = JSON.parse(json as string);
         setPixels(_config.pixels);
         setColours(_config.palette);
+        setName(_config.image_name);
       }
 
 
@@ -178,6 +176,7 @@ function App() {
 
       <div style={{ display: 'flex', flexDirection: 'column', marginLeft: 8 }}>
 
+        <input type="text" value={name} onChange={(e) => setName(e.target.value)} placeholder="image name ... "></input>
 
         <div style={{ display: 'flex', flexDirection: 'row', marginBottom: 8, gap: 4, alignItems: 'center' }}>
           <input ref={colourPicker} type="color" />
