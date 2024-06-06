@@ -19,7 +19,7 @@ function App() {
 
   const [mode, setMode] = useState<DRAW_MODE>("DRAW");
 
-  const [name, setName] = useState<string>("yoto_pic");
+  const [name, setName] = useState<string>("my_yoto_image");
   const [colours, setColours] = useState<string[]>([]);
   
   const [pixels, setPixels] = useState<string[][]>(new Array(GRID_SIZE).fill(DEFAULT_COLOUR).map(() => new Array(GRID_SIZE).fill(DEFAULT_COLOUR)));
@@ -88,7 +88,7 @@ function App() {
     //todo: reactify this
     var image = exportCanvas.current.toDataURL();
     var aDownloadLink = document.createElement('a');
-    aDownloadLink.download = 'my_yoto_image.png';
+    aDownloadLink.download = `${name ?? "my_yoto_image"}.png`;
     aDownloadLink.href = image;
     aDownloadLink.click();
 
@@ -160,8 +160,8 @@ function App() {
 
         <div style={{ display: 'fex', flexDirection: 'column' }}>
           <canvas ref={exportCanvas} width={16} height={16}></canvas>
-          <button style={{ display: 'block' }} onClick={() => exportPNG()}>export image</button>
-          <button style={{ display: 'block' }} onClick={() => exportJSON()}>export config</button>
+          <button style={{ display: 'block' }} onClick={() => exportPNG()} disabled={name.length === 0}>export image</button>
+          <button style={{ display: 'block' }} onClick={() => exportJSON()} disabled={name.length === 0}>export config</button>
           <button style={{ display: 'block' }} onClick={() => fileInput.current?.click()}>Import config</button>
         </div>
 
@@ -175,7 +175,7 @@ function App() {
 
 
       <div style={{ display: 'flex', flexDirection: 'column', marginLeft: 8 }}>
-
+        {name.length == 0 && <div style={{background:'red', color:'white', padding: '8px', marginBottom:8}}>Enter a name to export</div>}
         <input type="text" value={name} onChange={(e) => setName(e.target.value)} placeholder="image name ... "></input>
 
         <div style={{ display: 'flex', flexDirection: 'row', marginBottom: 8, gap: 4, alignItems: 'center' }}>
