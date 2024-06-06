@@ -19,27 +19,25 @@ function App() {
 
   const [mode, setMode] = useState<DRAW_MODE>("DRAW");
 
+  const [name, setName] = useState<string>("");
   const [colours, setColours] = useState<string[]>([]);
-  const colourPicker = useRef<HTMLInputElement>(null);
+  
   const [pixels, setPixels] = useState<string[][]>(new Array(GRID_SIZE).fill(DEFAULT_COLOUR).map(() => new Array(GRID_SIZE).fill(DEFAULT_COLOUR)));
 
+  const colourPicker = useRef<HTMLInputElement>(null);
   const exportCanvas = useRef<HTMLCanvasElement>(null);
+  const fileInput = useRef<HTMLInputElement>(null);
 
 
   const onPixelClicked = (x: number, y: number) => {
 
     const selectedColour: string = colourPicker.current?.value as string;
 
-    const nextPixels = pixels.map((_x, _xi) => {
-      return _x.map((_y, _yi) => {
-        if (_xi === x && _yi === y) {
-          return selectedColour;
-        }
-        return _y;
-      });
-    })
+    let next = [...pixels];
+    next[x][y] = selectedColour;
 
-    setPixels(nextPixels);
+
+    setPixels(next);
 
     if (colours.indexOf(selectedColour) == -1) {
       setColours((current) => [...current, selectedColour]);
@@ -66,9 +64,9 @@ function App() {
       alert("something fucky with the context");
       return;
     }
-    
 
-  //TODO: fix the drawing being rotated 90degress.     
+
+    //TODO: fix the drawing being rotated 90degress.     
     for (let x = 0; x < 16; x++) {
       for (let y = 0; y < 16; y++) {
         const pixel = pixels[y][x];
@@ -123,7 +121,34 @@ function App() {
     document.body.removeChild(element);
   }
 
+  const importJSON = () => {
 
+  }
+
+  //TODO: add event type
+  const importFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
+
+    const reader = new FileReader()
+    reader.onload = async (e) => {
+      if (e.target) {
+        const json = (e.target.result)
+        var _config = JSON.parse(json as string);
+        setPixels(_config.pixels);
+        setColours(_config.palette);
+      }
+
+
+    };
+
+    if(e.target.files)
+    {
+        reader.readAsText(e.target.files[0])
+    }
+    else
+    {
+      alert('no files selected');
+    }
+  }
 
   const fill = () => {
     const colourHex: string = colourPicker.current?.value as string;
@@ -132,13 +157,14 @@ function App() {
 
   return (
     <div style={{ display: "flex", flexDirection: "row", margin: 8 }}>
-
-      <div style={{ display: 'fex', flexDirection: 'column' }}>
+      <input ref={fileInput} type="file" onChange={importFile} style={{display:'none'}}></input>
+      <div  style={{ display: 'fex', flexDirection: 'column' }}>
 
         <div style={{ display: 'fex', flexDirection: 'column' }}>
           <canvas ref={exportCanvas} width={16} height={16}></canvas>
           <button style={{ display: 'block' }} onClick={() => exportPNG()}>export image</button>
           <button style={{ display: 'block' }} onClick={() => exportJSON()}>export config</button>
+          <button style={{ display: 'block' }} onClick={() => fileInput.current?.click()}>Import config</button>
         </div>
 
 
@@ -153,10 +179,10 @@ function App() {
       <div style={{ display: 'flex', flexDirection: 'column', marginLeft: 8 }}>
 
 
-        <div style={{ display: 'flex', flexDirection: 'row', marginBottom:8, gap: 4, alignItems:'center' }}>
+        <div style={{ display: 'flex', flexDirection: 'row', marginBottom: 8, gap: 4, alignItems: 'center' }}>
           <input ref={colourPicker} type="color" />
 
-          <button onClick={fill} style={{height:32}}>fill</button>
+          <button onClick={fill} style={{ height: 32 }}>fill</button>
 
 
           <div style={{ display: 'flex', flexDirection: 'row', gap: 2 }}>
