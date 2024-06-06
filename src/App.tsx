@@ -1,4 +1,4 @@
-import { useRef, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 
 /**
  * TODO:
@@ -8,17 +8,23 @@ import { useRef, useState } from "react"
  *  Add semi decent toolbars for colors / modes etc ... 
  */
 
+
+type DRAW_MODE = "DRAW" | "DELETE";
+
 function App() {
 
   const PIXEL_SIZE: number = 25;
   const GRID_SIZE: number = 16;
   const DEFAULT_COLOUR: string | null = null;
 
+  const [mode, setMode] = useState<DRAW_MODE>("DRAW");
+
   const [colours, setColours] = useState<string[]>([]);
   const colourPicker = useRef<HTMLInputElement>(null);
   const [pixels, setPixels] = useState<string[][]>(new Array(GRID_SIZE).fill(DEFAULT_COLOUR).map(() => new Array(GRID_SIZE).fill(DEFAULT_COLOUR)));
 
   const exportCanvas = useRef<HTMLCanvasElement>(null);
+
 
   const onPixelClicked = (x: number, y: number) => {
 
@@ -49,6 +55,7 @@ function App() {
   }
 
   const exportPNG = () => {
+
     if (!exportCanvas.current) {
       alert("canvas being fucky, can't export.");
       return;
@@ -56,25 +63,29 @@ function App() {
 
     var ctx = exportCanvas.current.getContext("2d");
     if (!ctx) {
+      alert("something fucky with the context");
       return;
     }
+    
 
-    for (let x = 0; x < pixels.length; x++) {
-      for (let y = 0; y < pixels[x].length; y++) {
-        console.log(x, y);
-        const pixel = pixels[x][y];
+  //TODO: fix the drawing being rotated 90degress.     
+    for (let x = 0; x < 16; x++) {
+      for (let y = 0; y < 16; y++) {
+        const pixel = pixels[y][x];
         if (pixel) {
-          ctx.rect(x, y, 1, 1);
+          ctx.rect(y, x, 1, 1);
           ctx.fillStyle = pixel;
           ctx.fillRect(x, y, 1, 1);
         }
         else {
           ctx.globalAlpha = 0;
-          ctx.fillRect(x, y, 1, 1);
+          ctx.fillRect(y, x, 1, 1);
           ctx.globalAlpha = 1;
         }
       }
     }
+
+
 
     //todo: reactify this
     var image = exportCanvas.current.toDataURL();
@@ -88,14 +99,16 @@ function App() {
   interface ImageConfig {
     image_name: string,
     pixels: string[][],
-    grid_size: number
+    grid_size: number,
+    palette: string[]
   }
 
   const exportJSON = () => {
-    const cfg : ImageConfig = {
+    const cfg: ImageConfig = {
       image_name: "my_yoto_pic",
       pixels: pixels,
-      grid_size: GRID_SIZE
+      grid_size: GRID_SIZE,
+      palette: colours
     };
 
     const jsonString = JSON.stringify(cfg);
@@ -120,31 +133,37 @@ function App() {
   return (
     <div style={{ display: "flex", flexDirection: "row", margin: 8 }}>
 
-      <div style={{ display: 'fex', flexDirection: 'column', border: "1px solid black" }}>
+      <div style={{ display: 'fex', flexDirection: 'column' }}>
 
         <div style={{ display: 'fex', flexDirection: 'column' }}>
           <canvas ref={exportCanvas} width={16} height={16}></canvas>
           <button style={{ display: 'block' }} onClick={() => exportPNG()}>export image</button>
-          <button style={{display: 'block'}} onClick={() => exportJSON()}>export config</button>
+          <button style={{ display: 'block' }} onClick={() => exportJSON()}>export config</button>
         </div>
 
 
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-          <input ref={colourPicker} type="color" />
-
-          <button onClick={fill}>fill</button>
-
-
-          <div style={{ display: 'flex', flexDirection: 'column' }}>
-            {colours.map(colour => <div key={colour} onClick={() => { onColourClicked(colour) }} style={{ width: PIXEL_SIZE, height: PIXEL_SIZE, marginTop: 8, background: colour, border: "1px solid black", }}></div>)}
-          </div>
 
         </div>
 
       </div>
 
 
-      <div style={{ display: 'flex', flexDirection: 'column', margin: 16 }}>
+
+      <div style={{ display: 'flex', flexDirection: 'column', marginLeft: 8 }}>
+
+
+        <div style={{ display: 'flex', flexDirection: 'row', marginBottom:8, gap: 4, alignItems:'center' }}>
+          <input ref={colourPicker} type="color" />
+
+          <button onClick={fill} style={{height:32}}>fill</button>
+
+
+          <div style={{ display: 'flex', flexDirection: 'row', gap: 2 }}>
+            {colours.map(colour => <div key={colour} onClick={() => { onColourClicked(colour) }} style={{ width: 32, height: 32, background: colour, border: "1px solid black", }}></div>)}
+          </div>
+
+        </div>
 
         {pixels.map((px, pxi) => {
 
@@ -164,7 +183,7 @@ function App() {
 
                 const pixel_background = py ? backgroundColour : chequered;
 
-                return <div key={`pixel_${pxi}_${pyi}`} onClick={() => onPixelClicked(pxi, pyi)} style={{ width: PIXEL_SIZE, height: PIXEL_SIZE, marginRight: '8px', marginBottom: '8px', border: "1px solid black", ...pixel_background }}></div>
+                return <div key={`pixel_${pxi}_${pyi}`} onClick={() => onPixelClicked(pxi, pyi)} style={{ width: PIXEL_SIZE, height: PIXEL_SIZE, marginRight: PIXEL_SIZE / 4, marginBottom: PIXEL_SIZE / 4, border: "1px solid black", ...pixel_background }}></div>
               })}
             </div>
           )
