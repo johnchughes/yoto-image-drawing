@@ -1,4 +1,4 @@
-import { Button, Container, Flex, Input, Stack } from "@mantine/core";
+import { ActionIcon, Button, Container, Flex, Input, Stack } from "@mantine/core";
 import { useEffect, useRef, useState } from "react"
 
 /**
@@ -35,8 +35,18 @@ function App() {
     const selectedColour: string = colourPicker.current?.value as string;
 
     let next = [...pixels];
-    next[x][y] = selectedColour;
 
+    switch(mode)
+    {
+      case "DELETE":
+        next[x][y] = null;
+        break;
+      case "DRAW":
+      default:
+        next[x][y] = selectedColour;
+        break;
+    }
+    
 
     setPixels(next);
 
@@ -178,6 +188,12 @@ function App() {
           {/* <input type="text" value={name} onChange={(e) => setName(e.target.value)} placeholder="image name ... "></input> */}
           <Input variant="filled" size="md" radius="xs" value={name} onChange={(e) => setName(e.target.value)} placeholder="image name ... " />
           {/* <div style={{ display: 'flex', flexDirection: 'row', marginBottom: 8, gap: 4, alignItems: 'center' }}> */}
+         
+         <Flex direction={"row"} gap={8}>
+          <Button variant={mode === "DRAW" ? "filled" : "outline"} onClick={() => setMode("DRAW")}>Draw</Button>
+          <Button variant={mode === "DELETE" ? "filled" : "outline"} onClick={() => setMode("DELETE")}>Erase</Button>
+         </Flex>
+         
             <Flex 
               direction={"row"} 
               gap={"md"}
