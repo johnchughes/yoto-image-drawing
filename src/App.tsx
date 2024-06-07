@@ -1,5 +1,5 @@
-import { ActionIcon, Button, Container, Flex, Input, Stack } from "@mantine/core";
-import { useEffect, useRef, useState } from "react"
+import { Button, Container, Flex, Input, Stack } from "@mantine/core";
+import { useRef, useState } from "react"
 
 /**
  * TODO:
@@ -39,7 +39,7 @@ function App() {
     switch(mode)
     {
       case "DELETE":
-        next[x][y] = null;
+        next[x][y] = null; //todo: find how to type the pixel array properly.
         break;
       case "DRAW":
       default:
